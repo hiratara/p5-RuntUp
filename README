@@ -1,27 +1,24 @@
-This is Perl module RuntUp.
+NAME
+    RuntUp - Just a file uploader.
 
-INSTALLATION
+SYNOPSIS
+      $ runtup 'SERVERSETTING' /path/to/file
 
-RuntUp installation is straightforward. If your CPAN shell is set up,
-you should just be able to do
+DESCRIPTION
+    RuntUp is a file uploader for private use.
 
-    % cpan RuntUp
+    It uploads files from the client to the remote, where the client and the
+    remote should have same structure of directories.
 
-Download it, unpack it, then build it as per the usual:
+    You can select one of the upload methods, SCP, FTP, and so on.
 
-    % perl Makefile.PL
-    % make && make test
+    Show sample.runtup and copy it to ~/.runtup .
 
-Then install it:
+AUTHOR
+    hiratara <hiratara@cpan.org>
 
-    % make install
+SEE ALSO
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
 
-DOCUMENTATION
-
-RuntUp documentation is available as in POD. So you can do:
-
-    % perldoc RuntUp
-
-to read the documentation online with your favorite pager.
-
-hiratara

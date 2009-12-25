@@ -1,0 +1,15 @@
+servers: 
+  my_server1:
+    uploader: SCP
+    local_prefix : /home/you/public_html/
+    server_prefix: /var/document_root/
+    user: user
+    host: my_server1.com
+
+  my_server2:
+    uploader: FTP
+    local_prefix : .+/path/to/my_contents/
+    server_prefix: /var/document_root/path/to/my_contents/
+    user: user
+    pass: pass
+    host: my_server2.com

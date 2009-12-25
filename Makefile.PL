@@ -1,6 +1,7 @@
 use inc::Module::Install;
 name 'RuntUp';
 all_from 'lib/RuntUp.pm';
+readme_from 'lib/RuntUp.pm';
 
 requires  'Any::Moose';
 requires  'File::HomeDir';

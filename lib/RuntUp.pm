@@ -91,15 +91,22 @@ __END__
 
 =head1 NAME
 
-RuntUp -
+RuntUp - Just a file uploader.
 
 =head1 SYNOPSIS
 
-  use RuntUp;
+  $ runtup 'SERVERSETTING' /path/to/file
 
 =head1 DESCRIPTION
 
-RuntUp is
+RuntUp is a file uploader for private use.
+
+It uploads files from the client to the remote, 
+where the client and the remote should have same structure of directories.
+
+You can select one of the upload methods, SCP, FTP, and so on.
+
+Show sample.runtup and copy it to ~/.runtup .
 
 =head1 AUTHOR
 
