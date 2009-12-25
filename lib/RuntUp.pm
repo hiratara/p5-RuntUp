@@ -1,6 +1,9 @@
 package RuntUp;
 use Any::Moose;
 use File::Spec;
+use YAML::Syck;
+use File::HomeDir qw/my_home/;
+use File::Spec::Functions;
 our $VERSION = '0.01';
 
 
@@ -14,6 +17,12 @@ has paths => (
 	is  => 'ro',
 	isa => 'ArrayRef[Str]',
 	required => 1,
+);
+
+has config => (
+	is  => 'ro',
+	isa => 'Ref',
+	default => sub { {} },
 );
 
 
@@ -34,8 +43,20 @@ __PACKAGE__->meta->make_immutable;
 no  Any::Moose;
 
 
+sub load_config{
+	my $self = shift;
+
+	my $path = catfile my_home, '.runtup';
+
+	$self->config( LoadFile( $path ) );
+}
+
+
 sub run {
 	my $self = shift;
+
+	$self->load_config;
+
 	foreach ( @{ $self->paths } ) {
 		my $abs = File::Spec->rel2abs($_);
 		my ($path) = ( $abs =~ m{/(?:SV[KN]|GIT)_work/some_project/[^/]+(/path/to/.+)$} ) 
