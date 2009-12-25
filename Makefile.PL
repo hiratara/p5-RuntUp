@@ -9,10 +9,12 @@ requires  'YAML::Syck';
 requires  'File::Spec';
 recommends 'Mouse';
 
+test_requires 'Test::More';
 tests 't/*.t';
 author_tests 'xt';
 
-test_requires 'Test::More';
+install_script 'bin/runtup';
+
 auto_set_repository;
 auto_include;
 WriteAll;
