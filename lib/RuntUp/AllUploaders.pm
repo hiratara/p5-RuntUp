@@ -9,16 +9,24 @@ use Net::OpenSSH;
 use Any::Moose;
 
 has [qw/user host/] => ( is => 'ro', isa => 'Str', required => 1 );
+has ssh => ( is => 'ro', isa => 'Net::OpenSSH', lazy_build => 1);
 
 __PACKAGE__->meta->make_immutable;
 no  Any::Moose;
 
-sub upload{
+sub _build_ssh {
 	my $self = shift;
-	my ( $local, $remote ) = @_;
 
 	my $ssh = Net::OpenSSH->new( $self->host, user => $self->user );
 	$ssh->error and die $ssh->error;
+
+	return $ssh;
+}
+
+sub upload{
+	my $self = shift;
+	my ( $local, $remote ) = @_;
+	my $ssh = $self->ssh;
 
 	$ssh->scp_put( {copy_attrs => 1}, $local, $remote ) or die $ssh->error;
 }
@@ -29,10 +37,20 @@ use Any::Moose;
 use Net::FTP;
 
 has [qw/user host pass/] => ( is => 'ro', isa => 'Str', required => 1 );
-has ftp => (is => 'rw', isa => 'Net::FTP');
+has ftp => (is => 'rw', isa => 'Net::FTP', lazy_build => 1);
 
 __PACKAGE__->meta->make_immutable;
 no  Any::Moose;
+
+sub _build_ftp {
+	my $self = shift;
+
+	my $ftp = Net::FTP->new( $self->host ) or die;
+	$ftp->login( $self->user, $self->pass ) or die $ftp->message;
+	$ftp->binary;
+
+	return $ftp;
+}
 
 sub upload{
 	my $self = shift;
@@ -40,13 +58,6 @@ sub upload{
 
 	! -f $local and do { warn "Support only file: ", $local; return; };
 	my $executable = -x $local;
-
-	unless( $self->ftp ){
-		my $ftp = Net::FTP->new( $self->host ) or die;
-		$ftp->login( $self->user, $self->pass ) or die $ftp->message;
-		$ftp->binary;
-		$self->ftp( $ftp );
-	}
 
 	# TODO: The server may not be same OS with the client.
 	my ( $vol, $dir, $file ) = File::Spec->splitpath( $remote );
