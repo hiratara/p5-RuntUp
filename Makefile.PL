@@ -7,6 +7,7 @@ requires  'Any::Moose';
 requires  'File::HomeDir';
 requires  'YAML::Syck';
 requires  'File::Spec';
+requires  'Net::OpenSSH';
 recommends 'Mouse';
 
 test_requires 'Test::More';

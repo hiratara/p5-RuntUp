@@ -5,6 +5,7 @@ our $VERSION = 0.01;
 
 
 package RuntUp::Uploader::SCP;
+use Net::OpenSSH;
 use Any::Moose;
 
 has [qw/user host/] => ( is => 'ro', isa => 'Str', required => 1 );
@@ -15,14 +16,11 @@ no  Any::Moose;
 sub upload{
 	my $self = shift;
 	my ( $local, $remote ) = @_;
-	system(
-		'scp', '-p',
-		$local,
-		sprintf( 
-			'%s@%s:%s', 
-			$self->user, $self->host, $remote
-		),
-	);
+
+	my $ssh = Net::OpenSSH->new( $self->host, user => $self->user );
+	$ssh->error and die $ssh->error;
+
+	$ssh->scp_put( {copy_attrs => 1}, $local, $remote ) or die $ssh->error;
 }
 
 
