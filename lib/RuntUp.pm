@@ -4,6 +4,7 @@ use File::Spec;
 use YAML::Syck;
 use File::HomeDir qw/my_home/;
 use File::Spec::Functions;
+use RuntUp::AllUploaders;
 our $VERSION = '0.01';
 
 
@@ -57,8 +58,8 @@ sub upload{
 
 	my $setting = $self->config->{servers}{ $self->server };
 
-	# TODO: implement it
-	$setting->{uploader} eq 'scp' or die;
+	# load Uploader
+	my $up = ('RuntUp::Uploader::' . $setting->{uploader})->new( $setting );
 
 	exists $setting->{local_prefix} or die;
 	my $local_regexp = qr(^$setting->{local_prefix});
@@ -66,25 +67,12 @@ sub upload{
 	exists $setting->{server_prefix} or die;
 	my $server_path = $setting->{server_prefix};
 
-	exists $setting->{user} or die;
-	my $user = $setting->{user};
-
-	exists $setting->{host} or die;
-	my $host = $setting->{host};
-
 	foreach ( @{ $self->paths } ) {
 		my $abs = File::Spec->rel2abs($_);
 		(my $path = $abs) =~ s/$local_regexp// or next;
-		system(
-			'scp', '-p',
-			$abs,
-			sprintf( 
-				'%s@%s:%s', 
-				# TODO: Don't use catfile 
-				#       (The host OS may not be the client OS.)
-				$user, $host, catfile( $server_path, $path ) 
-			),
-		);
+		# TODO: Don't use catfile 
+		#       (The host OS may not be the client OS.)
+		$up->upload( $abs, catfile( $server_path, $path ) );
 	}
 
 }
