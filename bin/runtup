@@ -1,12 +1,7 @@
 #!/usr/bin/env perl
-use File::Spec;
-foreach (@ARGV){
-	my $abs = File::Spec->rel2abs($_);
-	my ($path) = ( $abs =~ m{/(?:SV[KN]|GIT)_work/some_project/[^/]+(/path/to/.+)$} ) 
-	                                                                   or next;
-	system(
-		'scp', '-p',
-		$abs,
-		'user@host:' . $path,
-	);
-}
+use strict;
+use warnings;
+use FindBin::libs;
+use RuntUp;
+
+RuntUp->new( @ARGV )->run;

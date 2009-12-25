@@ -2,7 +2,8 @@ use inc::Module::Install;
 name 'RuntUp';
 all_from 'lib/RuntUp.pm';
 
-# requires '';
+requires  'Any::Moose';
+recommends 'Mouse';
 
 tests 't/*.t';
 author_tests 'xt';
