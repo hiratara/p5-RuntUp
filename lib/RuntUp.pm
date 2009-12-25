@@ -20,7 +20,7 @@ has paths => (
 );
 
 has config => (
-	is  => 'ro',
+	is  => 'rw',
 	isa => 'Ref',
 	default => sub { {} },
 );
@@ -52,21 +52,49 @@ sub load_config{
 }
 
 
+sub upload{
+	my $self = shift;
+
+	my $setting = $self->config->{servers}{ $self->server };
+
+	# TODO: implement it
+	$setting->{uploader} eq 'scp' or die;
+
+	exists $setting->{local_prefix} or die;
+	my $local_regexp = qr(^$setting->{local_prefix});
+
+	exists $setting->{server_prefix} or die;
+	my $server_path = $setting->{server_prefix};
+
+	exists $setting->{user} or die;
+	my $user = $setting->{user};
+
+	exists $setting->{host} or die;
+	my $host = $setting->{host};
+
+	foreach ( @{ $self->paths } ) {
+		my $abs = File::Spec->rel2abs($_);
+		(my $path = $abs) =~ s/$local_regexp// or next;
+		system(
+			'scp', '-p',
+			$abs,
+			sprintf( 
+				'%s@%s:%s', 
+				# TODO: Don't use catfile 
+				#       (The host OS may not be the client OS.)
+				$user, $host, catfile( $server_path, $path ) 
+			),
+		);
+	}
+
+}
+
+
 sub run {
 	my $self = shift;
 
 	$self->load_config;
-
-	foreach ( @{ $self->paths } ) {
-		my $abs = File::Spec->rel2abs($_);
-		my ($path) = ( $abs =~ m{/(?:SV[KN]|GIT)_work/some_project/[^/]+(/path/to/.+)$} ) 
-			or next;
-		system(
-			'scp', '-p',
-			$abs,
-			'user@host:' . $path,
-		);
-	}
+	$self->upload;
 }
 
 
