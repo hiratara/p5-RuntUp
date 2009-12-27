@@ -18,4 +18,5 @@ install_script 'bin/runtup';
 
 auto_set_repository;
 auto_include;
+auto_install;
 WriteAll;
