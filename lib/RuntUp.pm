@@ -61,23 +61,42 @@ sub upload{
 	# load Uploader
 	my $up = ('RuntUp::Uploader::' . $setting->{uploader})->new( $setting );
 
-	exists $setting->{local_prefix} or die;
-	my $local_regexp = qr(^$setting->{local_prefix});
-
-	exists $setting->{server_prefix} or die;
-	my $server_path = $setting->{server_prefix};
+	# XXX Should I make a separate parser?
+	my @prefixes;
+	if( exists $setting->{prefixes} ){
+		@prefixes = @{ $setting->{prefixes} };
+	} else {
+		my %prefix = map {
+			exists $setting->{$_} ? ( $_ => $setting->{$_} ) : ()
+		} qw/local_prefix server_prefix/;
+		push @prefixes, \%prefix;
+	}
 
 	foreach ( @{ $self->paths } ) {
 		my $abs = File::Spec->rel2abs($_);
-		(my $path = $abs) =~ s/$local_regexp// or do {
-			warn "Ignored $abs\n";
-			next;
-		};
-		# TODO: Don't use catfile 
-		#       (The host OS may not be the client OS.)
-		$up->upload( $abs, catfile( $server_path, $path ) );
-	}
 
+		my @from_to;
+		for my $s ( @prefixes ) {
+			exists $s->{local_prefix} or die;
+			my $local_regexp = qr(^$s->{local_prefix});
+
+			exists $s->{server_prefix} or die;
+			my $server_path = $s->{server_prefix};
+
+			(my $path = $abs) =~ s/$local_regexp// or next;
+
+			# TODO: Don't use catfile 
+			#       (The host OS may not be the client OS.)
+			@from_to = ( $abs, catfile( $server_path, $path ) );
+			last;
+		}
+
+		if( @from_to ){
+			$up->upload( @from_to );
+		} else {
+			warn "Ignored $abs\n";
+		}
+	}
 }
 
 

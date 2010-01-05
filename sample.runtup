@@ -8,8 +8,11 @@ servers:
 
   my_server2:
     uploader: FTP
-    local_prefix : .+/path/to/my_contents/
-    server_prefix: /var/document_root/path/to/my_contents/
+    prefixes:
+      - local_prefix : .+/path/to/my_contents/
+        server_prefix: /var/document_root/path/to/my_contents/
+      - local_prefix : .+/path/to/others/
+        server_prefix: /home/path/to/others/
     user: user
     pass: pass
     host: my_server2.com
