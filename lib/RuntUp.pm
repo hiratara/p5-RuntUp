@@ -69,7 +69,10 @@ sub upload{
 
 	foreach ( @{ $self->paths } ) {
 		my $abs = File::Spec->rel2abs($_);
-		(my $path = $abs) =~ s/$local_regexp// or next;
+		(my $path = $abs) =~ s/$local_regexp// or do {
+			warn "Ignored $abs\n";
+			next;
+		};
 		# TODO: Don't use catfile 
 		#       (The host OS may not be the client OS.)
 		$up->upload( $abs, catfile( $server_path, $path ) );
