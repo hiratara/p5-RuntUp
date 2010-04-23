@@ -8,6 +8,7 @@ requires  'File::HomeDir';
 requires  'YAML::Syck';
 requires  'File::Spec';
 requires  'Net::OpenSSH';
+requires  'FindBin::libs';
 recommends 'Mouse';
 
 test_requires 'Test::More';
