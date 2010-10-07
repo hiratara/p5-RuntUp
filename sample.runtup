@@ -16,3 +16,10 @@ servers:
     user: user
     pass: pass
     host: my_server2.com
+
+  my_server3:
+    uploader: SCP
+    local_prefix : /tmp
+    server_prefix: /tmp
+    user: user
+    host: my_server3.com:10022
