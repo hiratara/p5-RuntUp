@@ -1,4 +1,5 @@
 cover_db
+MYMETA.*
 META.yml
 Makefile
 blib
