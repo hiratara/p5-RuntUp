@@ -119,6 +119,9 @@ sub upload{
 		if( @from_to ){
 			if ($self->reverse and -e $from_to[0]) {
 				next if dialog "Override $from_to[0]? [Yn]: " ne 'Y';
+			} elsif (! $self->reverse and ! -e $from_to[0]) {
+				warn "Doesn't exist: $from_to[0]\n";
+				next;
 			}
 			$up->$meth( @from_to );
 		} else {
