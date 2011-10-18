@@ -7,23 +7,32 @@ use File::Spec::Functions;
 use RuntUp::AllUploaders;
 our $VERSION = '0.01';
 
+with any_moose('X::Getopt');
+
+has reverse => (
+	is  => 'ro',
+	isa => 'Bool',
+);
 
 has server => (
 	is  => 'ro',
 	isa => 'Str',
 	required => 1,
+	metaclass => "NoGetopt",
 );
 
 has paths => (
 	is  => 'ro',
 	isa => 'ArrayRef[Str]',
 	required => 1,
+	metaclass => "NoGetopt",
 );
 
 has config => (
 	is  => 'rw',
 	isa => 'Ref',
 	default => sub { {} },
+	metaclass => "NoGetopt",
 );
 
 
@@ -31,12 +40,13 @@ around BUILDARGS => sub {
 	my $meth  = shift;
 	my $class = shift;
 
-	my $server = shift @_;
+	my $params = $class->$meth(@_);
 
-	return $class->$meth(
-		server  => $server,
-		paths   => [ @_ ],
-	);
+	my @argv = @{$params->{extra_argv}};
+	$params->{server} = shift @argv;
+	$params->{paths} = \@argv;
+
+	return $params;
 };
 
 
@@ -60,6 +70,7 @@ sub upload{
 
 	# load Uploader
 	my $up = ('RuntUp::Uploader::' . $setting->{uploader})->new( $setting );
+	my $meth = $self->reverse ? 'download' : 'upload';
 
 	# XXX Should I make a separate parser?
 	my @prefixes;
@@ -92,7 +103,7 @@ sub upload{
 		}
 
 		if( @from_to ){
-			$up->upload( @from_to );
+			$up->$meth( @from_to );
 		} else {
 			warn "Ignored $abs\n";
 		}

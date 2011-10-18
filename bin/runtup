@@ -4,4 +4,4 @@ use warnings;
 use FindBin::libs;
 use RuntUp;
 
-RuntUp->new( @ARGV )->run;
+RuntUp->new_with_options->run;

@@ -10,6 +10,7 @@ requires  'File::Spec';
 requires  'Net::OpenSSH';
 requires  'FindBin::libs';
 recommends 'Mouse';
+recommends 'MouseX::Getopt';
 
 test_requires 'Test::More';
 tests 't/*.t';

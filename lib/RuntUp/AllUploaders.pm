@@ -31,6 +31,14 @@ sub upload{
 	$ssh->scp_put( {copy_attrs => 1}, $local, $remote ) or die $ssh->error;
 }
 
+sub download {
+	my ($self, $local, $remote) = @_;
+
+	$self->ssh->scp_get(
+		{copy_attrs => 1}, $remote => $local
+	) or die $self->ssh->error;
+}
+
 
 package RuntUp::Uploader::FTP;
 use Any::Moose;
@@ -67,6 +75,18 @@ sub upload{
 	$self->ftp->site( qw(CHMOD 755), $result ) if $executable;
 
 	print "put: ", $result, "\n";
+}
+
+sub download {
+	my ($self, $local, $remote) = @_;
+
+	my ($remote_info) = $self->ftp->dir($remote);
+	my ($is_executable) = $remote_info =~ /^.{9}(x)/i;
+
+	my $result = $self->ftp->get($remote, $local);
+	chmod 0755, $result if $is_executable;
+
+	print "get: ", $result, "\n";
 }
 
 
