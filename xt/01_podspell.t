@@ -8,3 +8,6 @@ __DATA__
 hiratara
 hiratara@cpan.org
 RuntUp
+runtup
+SCP
+uploader
