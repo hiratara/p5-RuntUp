@@ -54,6 +54,20 @@ __PACKAGE__->meta->make_immutable;
 no  Any::Moose;
 
 
+sub dialog($) {
+	my ($message) = @_;
+
+	print $message;
+	my $ans = do { local $| = 1; <STDIN> };
+	unless (defined $ans) {
+		print "\n";
+		$ans = "";
+	}
+
+	chomp $ans;
+	$ans;
+}
+
 sub load_config{
 	my $self = shift;
 
@@ -103,6 +117,9 @@ sub upload{
 		}
 
 		if( @from_to ){
+			if ($self->reverse and -e $from_to[0]) {
+				next if dialog "Override $from_to[0]? [Yn]: " ne 'Y';
+			}
 			$up->$meth( @from_to );
 		} else {
 			warn "Ignored $abs\n";
