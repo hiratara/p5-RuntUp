@@ -98,9 +98,9 @@ sub upload{
 	}
 
 	foreach ( @{ $self->paths } ) {
-		my $abs = File::Spec->rel2abs($_);
+		my $local_path = File::Spec->rel2abs($_);
 
-		my @from_to;
+		my $remote_path;
 		for my $s ( @prefixes ) {
 			exists $s->{local_prefix} or die;
 			my $local_regexp = qr(^$s->{local_prefix});
@@ -108,24 +108,24 @@ sub upload{
 			exists $s->{server_prefix} or die;
 			my $server_path = $s->{server_prefix};
 
-			(my $path = $abs) =~ s/$local_regexp// or next;
+			(my $path = $local_path) =~ s/$local_regexp// or next;
 
 			# TODO: Don't use catfile 
 			#       (The host OS may not be the client OS.)
-			@from_to = ( $abs, catfile( $server_path, $path ) );
+			$remote_path = catfile($server_path, $path);
 			last;
 		}
 
-		if( @from_to ){
-			if ($self->reverse and -e $from_to[0]) {
-				next if dialog "Override $from_to[0]? [Yn]: " ne 'Y';
-			} elsif (! $self->reverse and ! -e $from_to[0]) {
-				warn "Doesn't exist: $from_to[0]\n";
+		if ($remote_path) {
+			if ($self->reverse and -e $local_path) {
+				next if dialog "Override $local_path? [Yn]: " ne 'Y';
+			} elsif (! $self->reverse and ! -e $local_path) {
+				warn "Doesn't exist: $local_path\n";
 				next;
 			}
-			$up->$meth( @from_to );
+			$up->$meth($local_path => $remote_path);
 		} else {
-			warn "Ignored $abs\n";
+			warn "Ignored $local_path\n";
 		}
 	}
 }
